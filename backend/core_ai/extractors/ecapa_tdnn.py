@@ -5,6 +5,8 @@ This model is modified and combined based on the following three projects:
   2. https://github.com/lawlict/ECAPA-TDNN/blob/master/ecapa_tdnn.py
   3. https://github.com/speechbrain/speechbrain/blob/96077e9a1afff89d3f5ff47cab4bca0202770e4f/speechbrain/lobes/models/ECAPA_TDNN.py
 
+Copy from:
+    https://github.com/TaoRuijie/ECAPA-TDNN/blob/main/model.py
 '''
 
 import math
@@ -209,39 +211,3 @@ class ECAPA_TDNN(nn.Module):
 
         return x
 
-# class ECAPAModel(nn.Module):
-#     def __init__(self,
-#                  C=1024,
-#                  n_speakers=40,
-#                  mode='train'
-#                  ):
-#         super(ECAPAModel, self).__init__()
-#         self.speaker_encoder = ECAPA_TDNN(C=C)
-#         if mode == 'train':
-#             self.aug = True
-#         else:
-#             self.aug = False
-#         # Final Layer
-#         self.weight = nn.Parameter(
-#             torch.FloatTensor(n_speakers, 192), requires_grad=True
-#         )
-#         nn.init.xavier_uniform_(self.weight)
-#
-#     def forward(self, x):
-#         x = self.speaker_encoder(x, aug=self.aug)
-#         x = F.linear(F.normalize(x), F.normalize(self.weight))
-#         return x
-
-
-# #debug
-# if __name__ == '__main__':
-#     import numpy as np
-#     model = ECAPAModel(n_speakers=30)
-#     # model_parameters = filter(lambda p: p.requires_grad, model.parameters())
-#     # params = sum([np.prod(p.size()) for p in model_parameters])
-#     # print(params)
-#     inputs = torch.rand((128,16000), requires_grad=False)
-#     print(model)
-#     out = model(inputs)
-#     print(out)
-#     print(out.size())

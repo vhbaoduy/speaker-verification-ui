@@ -31,7 +31,6 @@ def audiorec_demo_app():
     # once a recording is completed, audio data will be saved to wav_audio_data
 
     wav_audio_data = st_audiorec() # tadaaaa! yes, that's it! :D
-    
 
     # add some spacing and informative messages
     col_info, col_space = st.columns([0.57, 0.43])
