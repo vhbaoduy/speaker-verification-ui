@@ -2,24 +2,33 @@ from .extractors import get_extractor, get_model_path
 from .matching import compute_score
 from .utils import convert_bytes_to_array, process_data
 from .local_config import Configs
+import asyncio
+import numpy as np
 
 class SpeakerVerification:
     def __init__ (self, 
                   configs):
         self.configs = configs
-        self.extractor = get_extractor(channel=configs["extractor"]["channel"],
-                                                  path=get_model_path(configs["root"],configs["extractor"]["channel"]),
+        path = get_model_path(configs["root"],configs["extractor_channel"])
+        
+        self.extractor = get_extractor(channel=configs["extractor_channel"],
+                                                  path=path,
                                                   device=configs["device"])
         self.threshold = configs["threshold"]
         
 
     def extract_feature(self, wave_bytes):
-        audio = convert_bytes_to_array(wave_bytes, 
-                                             Configs.SAMPLING_RATE)
-        data = process_data(audio, 
-                                  Configs.SAMPLING_RATE,
-                                  Configs.DURATION,
-                                  Configs.NUM_STACK)
+        data = np.array([])
+        for wav in wave_bytes:
+            audio, _ = convert_bytes_to_array(wav, 
+                                                Configs.SAMPLING_RATE)
+            audio = process_data(audio, 
+                                    Configs.SAMPLING_RATE,
+                                    Configs.DURATION,
+                                    Configs.NUM_STACK)
+            print(audio.shape)
+            data = np.append(data, audio,axis=0)
+        # data = np.array(data)
         feats = self.extractor.extract_embedding(data)
         return feats
     

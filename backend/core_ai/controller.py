@@ -8,9 +8,11 @@ class CoreAIController:
     def __init__(self):
         self.configs = read_config(Configs.PATH_TO_CONFIG)
         self.instance = None
+        self.set_up()
 
     def set_up(self):
         manager.download_all_models(self.configs['root'])
+        self.creat_AI_instance()
 
     def get_available_models(self):
         return manager.MODEL_TYPES
@@ -40,6 +42,5 @@ class CoreAIController:
         '''
             Get instance of core
         '''
-        if self.instance is not None:
-            instance = SpeakerVerification(configs=self.configs)
-        return instance
+        if self.instance is None:
+            self.instance = SpeakerVerification(configs=self.configs)

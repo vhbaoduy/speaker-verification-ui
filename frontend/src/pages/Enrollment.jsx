@@ -24,6 +24,18 @@ function Enrollment() {
         Object.values(e.target.files).forEach(file => array.push(file));
         setFiles(array);
     }
+
+    const readFile = (file)=>{
+        return new Promise((resolve, reject)=>{
+            const reader = new FileReader();
+            // Register event listeners
+            reader.addEventListener("loadend", e => resolve(e.target.result))
+            reader.addEventListener("error", reject)
+
+            // Read file
+            reader.readAsArrayBuffer(file)
+        })
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         // console.log(`Start submit ${JSON.stringify(formData)}`);
@@ -45,10 +57,16 @@ function Enrollment() {
             return;
         }
         const audioData = [];
-        console.log(`Before loop: `, audioData)
+        // console.log(`Before loop: `, audioData)
 
         if (files.length > 0) {
-            await files.forEach((file) => {
+            await files.forEach(async (file) => {
+                // const arrayBuffer = await file.arrayBuffer();
+                // console.log('buffer', buffer);
+                // const array =   new Uint8Array(await file.arrayBuffer());
+                // console.log('Array buffer', array);
+                // const base64String = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
                 data.append('data',file);
             })
         }
@@ -82,17 +100,6 @@ function Enrollment() {
             audios.forEach(audio =>
                 data.append("data", audio)
             )
-            // await audioUrls.forEach(async (aUrl, i) => {
-            //     const res = await axios({
-            //         url: aUrl,
-            //         method: "GET",
-            //         responseType: "blob"
-            //     }).then(res => res.data)
-            //     const audioFile = new File([res], `voice-${i}.wav`);
-            //     audioData.push(audioFile);
-            //     console.log('inner audio data: ', audioData);
-            // }
-            // );
 
 
         }
@@ -101,7 +108,7 @@ function Enrollment() {
         // audioData.forEach(audio =>
         //         data.append("data", audio)
         // )
-        console.log(`data: `, data.values());
+        // console.log(`data: `, a.values());
         data.append("user", user);
 
         await axios({

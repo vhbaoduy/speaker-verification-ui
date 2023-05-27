@@ -3,6 +3,8 @@ from fastapi import FastAPI, HTTPException
 from apis.base import api_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import asyncio
+
 server_api = FastAPI()
 
 server_api.include_router(api_router, prefix='/api')
@@ -27,7 +29,7 @@ server_api.add_middleware(
 
 
 
-# if __name__ == '__main__':
-#     uvicorn.run('main:server_api',
-#                 host=configs['host'],
-#                 port=configs['port'])
+if __name__ == '__main__':
+    uvicorn.run('main:server_api',
+                host=configs['host'],
+                port=configs['port'])

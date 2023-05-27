@@ -3,7 +3,7 @@ from .extractor import EmbeddingExtractor
 from ..utils import LOG
 import glob
 import gdown
-
+import asyncio
 '''
     - All models are pretrained from https://github.com/TaoRuijie/ECAPA-TDNN with different configuration.
     - Get models from my thesis.
@@ -48,9 +48,9 @@ def check_pretrained_models(root,channel):
     path = os.path.join(root,'models')
     if not os.path.exists(path):
         os.mkdir(path)
-        download_model(path)
+        download_model(path,channel)
     else:
-        files = glob.glob(os.path.join(root, 'models/ecapa-tdnn-*.model'))
+        files = glob.glob(os.path.join(root, 'models/ecapa-tdnn-%s.model'%channel))
         if len(files) == 0:
             download_model(path,channel)
 
@@ -68,6 +68,7 @@ def get_model_path(root,channel):
     path = os.path.join(root, 'models/ecapa-tdnn-%s.model'%channel)
     files = glob.glob(path)
     if len(files) == 0:
+        # print("Hello bug")
         LOG.info('Downloading pretrained model')
         check_pretrained_models(root, channel)
     return path

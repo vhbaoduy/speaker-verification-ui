@@ -12,28 +12,14 @@ import json
 user_router = APIRouter()
 
 
-# class UserRequest(BaseModel):
-#     name: str
-#     wav_bytes: list
-
-# @user_router.post("/file")
-# async def get_file( file: UploadFile = File()):
-#     print(file)
-#     return {'status': True}
-
-# @user_router.post("/files")
-# async def get_files( files: List[UploadFile]):
-#     print(files)
-#     return {'status': True}
-
 @user_router.post("/")
 async def create_user(user: str= Form(), 
                       data: List[UploadFile]=File()):
     # print(json.loads(user))
-    print(data)
-    return users.create_user_internal(user, data)
+    # print(data)
+    return await users.create_user_internal(user, data)
 
 
 @user_router.post("/verify")
-async def verify_user(req:UserRequest):
-    return users.verify_user_interal(req)
+async def verify_user(data: UploadFile=File()):
+    return users.verify_user_interal(data)
