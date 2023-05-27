@@ -7,8 +7,10 @@ from .extractors import manager
 class CoreAIController:
     def __init__(self):
         self.configs = read_config(Configs.PATH_TO_CONFIG)
-        manager.download_all_models(self.configs['root'])
         self.instance = None
+
+    def set_up(self):
+        manager.download_all_models(self.configs['root'])
 
     def get_available_models(self):
         return manager.MODEL_TYPES

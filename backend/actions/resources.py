@@ -1,6 +1,5 @@
-from core_ai import CORE_CONTROLLER, LOG, utils, validation
+from core_ai import utils
 from fastapi import HTTPException
-from model_request import ConfigRequest
 
 
 def get_devices_internal():
