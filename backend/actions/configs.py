@@ -1,6 +1,6 @@
 from core_ai import CORE_CONTROLLER, LOG, utils, validation
 from fastapi import HTTPException
-from model_request import ConfigRequest
+from model.request import ConfigRequest
 
 
 def get_configs_internal():

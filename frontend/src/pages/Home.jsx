@@ -1,11 +1,10 @@
 import React from "react";
-// import Box from '@mui/material/Box';
-// import Button from '@mui/material/Button';
-// import { Container } from "@mui/system";
-// import Enrollment from "./Enrollment";
 import { useNavigate } from "react-router-dom";
 import "../styles/home.css"
-
+import Button from "react-bootstrap/Button"
+import Row from "react-bootstrap/Row"
+import Col from "react-bootstrap/Col"
+import Container from "react-bootstrap/Container"
 
 const Home = () => {
     const navigate = useNavigate();
@@ -13,22 +12,27 @@ const Home = () => {
         // 👇️ navigate to /contacts
         navigate('/enrollment');
       };
+      const navigateToTesting = () => {
+        // 👇️ navigate to /contacts
+        navigate('/authentication');
+      };
     return (
-        <div class="background">
-            <div class="my-home">
-            <button class="my-button" onClick={navigateToEnrollment}>
-            Enroll
-            </button>
-            </div>
-            <div class="my-home">
-                <button class="my-button" >
-                Test
-                </button>
-            </div>
-        </div>
-            
-        
-       
+        <Container className="my-home">
+          <Row>
+            <Col>
+              <Button variant="primary" size="lg" onClick={navigateToEnrollment}>
+                Enrollment
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Button variant="success" size="lg" onClick={navigateToTesting}>
+                Authentication
+              </Button>
+            </Col>
+          </Row>
+        </Container>
   );
 }
 

@@ -4,17 +4,35 @@ import "../styles/home.css";
 import "../styles/form.css";
 import axios from "axios";
 import Configs from "../configs";
+import Row from "react-bootstrap/Row"
+import Col from "react-bootstrap/Col"
+import Container from "react-bootstrap/Container"
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Users from "../components/Users";
+import Notification from "../components/Notification";
+import { Button, Spinner } from "react-bootstrap";
+// import AudioRecorder from "../components/AudioRecorder";
+
 
 
 function Enrollment() {
+    const [notification, setNotification] = useState(null);
     const [user, setUser] = useState('')
     const [files, setFiles] = useState([]);
+    const [loading, setLoading] = useState(false);
+    // const [audioUrls, setAudioUrls] = useState([])
 
-    const [audioUrls, setAudioUrls] = useState([])
-
-    const addUrlToForm = (audioUrl) => {
-        setAudioUrls([...audioUrls, audioUrl]);
+    const resetNotification = () => {
+        setNotification(null);
     }
+
+    const addBlobFromRecorderToForm = (blob) => {
+        setFiles([...files, blob])
+    }
+
+    // const addUrlToForm = (audioUrl) => {
+    //     setAudioUrls([...audioUrls, audioUrl]);
+    // }
 
     const setUserName = (e) => {
         setUser(e.target.value)
@@ -25,17 +43,6 @@ function Enrollment() {
         setFiles(array);
     }
 
-    const readFile = (file)=>{
-        return new Promise((resolve, reject)=>{
-            const reader = new FileReader();
-            // Register event listeners
-            reader.addEventListener("loadend", e => resolve(e.target.result))
-            reader.addEventListener("error", reject)
-
-            // Read file
-            reader.readAsArrayBuffer(file)
-        })
-    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         // console.log(`Start submit ${JSON.stringify(formData)}`);
@@ -43,72 +50,63 @@ function Enrollment() {
         // console.log(`Start submit ${JSON.stringify(formData)}`)
         // const audios = audioUrls;
         const data = new FormData();
-        console.log(audioUrls);
-        if (!audioUrls && !audioUrls.length) {
-            alert('Audios not found');
-        }
+        // console.log(audioUrls);
+        // if (!audioUrls && !audioUrls.length) {
+        //     alert('Audios not found');
+        // }
         // Check username
         if (user === '') {
             alert("Username is empty!");
             return;
         }
-        if (files.length + audioUrls.length == 0) {
-            alert("Not found voice to enroll!");
+        if (files.length == 0) {
+            setNotification({
+                message: "Voice not found!",
+                type: "danger"
+            })
+            // alert("Not found voice to enroll!");
             return;
         }
-        const audioData = [];
+        // const audioData = [];
         // console.log(`Before loop: `, audioData)
 
         if (files.length > 0) {
             await files.forEach(async (file) => {
-                // const arrayBuffer = await file.arrayBuffer();
-                // console.log('buffer', buffer);
-                // const array =   new Uint8Array(await file.arrayBuffer());
-                // console.log('Array buffer', array);
-                // const base64String = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-
-                data.append('data',file);
+                data.append('data', file);
             })
         }
 
-        if (audioUrls.length > 0) {
-            const audios = await Promise.all(
-                audioUrls.map(
-                    async (aUrl, i) => {
-                        const res = await axios({
-                            url: aUrl,
-                            method: "GET",
-                            responseType: "blob"
-                        }).then(res => res.data);
+        // if (audioUrls.length > 0) {
+        //     const audios = await Promise.all(
+        //         audioUrls.map(
+        // async (aUrl, i) => {
+        //     const res = await axios({
+        //         url: aUrl,
+        //         method: "GET",
+        //         responseType: "blob"
+        //     })
+        //     console.log(res.data)
 
-                        const audioFile = new File([res], `voice-${i}.wav`);
-                        // .then(async (res) => {
-                        //     // console.log(res.data);
-                        //     const  audioFile =  new File([res.data], `voice-${i}.wav`)
-                        //     // console.log(audioFile);
-                        //     data.append('data', audioFile);
-                        // })
-
-                        return audioFile
-                        //     // console.log(audioFile);
-                        data.append('data', audioFile);
-                    }
-                )
-            )
-
-            console.log(audios);
-            audios.forEach(audio =>
-                data.append("data", audio)
-            )
+        //     const audioFile = new File([res.data], `voice-${i}.wav`, {
+        //         type: 'audio/wav',
+        //     });
 
 
-        }
+        //     return audioFile
+        //     //     // console.log(audioFile);
+        //     // data.append('data', audioFile);
+        // }
+        //         )
+        //     )
 
-        // console.log(`After loop: `, audioData);
-        // audioData.forEach(audio =>
+        //     console.log(audios);
+        //     audios.forEach(audio =>
         //         data.append("data", audio)
-        // )
-        // console.log(`data: `, a.values());
+        //     )
+
+
+        // }
+        // console.log('files', files)
         data.append("user", user);
 
         await axios({
@@ -119,43 +117,94 @@ function Enrollment() {
                 'Content-Type': 'multipart/form-data'
             }
         })
-            .then((res) => { console.log(res) })
-            .catch((error) => { console.log(error.message) })
+        .then((res) => {return res.data})
+        .then((response)=>{
+            console.log(response)
+        })
+        .catch((error) => { console.log(error.message) })
+
+        resetForm()
+    };
+
+    const resetForm = () =>{
+        // const userElement = document.getElementById("username");
+        // userElement.target.value = "";
+        // const fileElement = document.getElementById("seletectedFiles");
+        // fileElement.target.files = [];
+        setFiles([])
+        setUser('')
+    }
+
+    const handleDeleteItem = (index) => {
+        const fileE = document.getElementById("selectedFiles")
+        fileE.target.value = "";
+        const updatedFiles = [...files];
+        updatedFiles.splice(index, 1);
+        setFiles(updatedFiles);
     };
 
 
-    const clearAudioUrls = (e) => {
-        e.preventDefault();
-        setAudioUrls([]);
-    }
 
-    return (<div class="my-home">
-        <h1>Enrollment</h1>
-        <VoiceRecorder addUrls={addUrlToForm} />
-        <h2>Form</h2>
-        <form>
-            <div>
-                <label>User name</label>
-                <input type="text" onChange={setUserName}></input>
-            </div>
-            <div>
-                <input type="file" multiple onChange={getFiles}></input>
-                {/* <ul>
-                    {files.map((file, i) => (
-                    <li key={i}>
-                        {file.name} - {file.type}
-                    </li>
-                    ))}
-                </ul> */}
-            </div>
-            <div id="added_audio">
-                <div>
-                    <button onClick={clearAudioUrls}>Clear Audio</button>
-                </div>
-            </div>
-            <button onClick={handleSubmit}>Enroll</button>
-        </form>
-    </div>);
+
+    return (
+        <Container>
+            {/* <Notification message={"Clear audio successfuly"} type={"success"}></Notification> */}
+            <Row>
+                <Col xs={12} md={8}>
+                    <div>
+                        <h1>Enrollment</h1>
+                        <p>Record or Upload 3 files to enroll the system</p>
+                        <center><VoiceRecorder addFiles={addBlobFromRecorderToForm} /></center>
+                        {/* <AudioRecorder/> */}
+                        <h2>Form submission</h2>
+                        <form>
+                            <div>
+                                <label>User name</label>
+                                <input id="username" type="text" onChange={setUserName} value={user}></input>
+                            </div>
+                            <div>
+                                <input id="seletectedFiles" type="file" multiple onChange={getFiles}></input>
+                            </div>
+
+                            {files.length > 0 &&
+                                <div>
+                                    <label>Recored Audio</label>
+                                    <div style={{ height: '250px', overflow: 'auto' }}>
+                                        {files.map((file, index) => (
+                                            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
+                                                <audio src={URL.createObjectURL(file)} controls></audio>
+                                                <Button variant="danger" onClick={() => { handleDeleteItem(index) }}>Delete</Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            }
+                            <div>
+                                <Button onClick={handleSubmit} variant="primary">Enroll</Button>
+                            </div>
+
+                        </form>
+                    </div>
+                </Col>
+
+                <Col xs={6} md={4}>
+                    <h1>Enrolled users</h1>
+                    <Users/>
+                </Col>
+            </Row>
+            {notification && (
+                <Notification message={notification.message} type={notification.type} />
+            )}
+            {/* {loading ? (
+                <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            ):console.log("Hello")} */}
+        </Container>
+
+
+
+    );
 
 }
 export default Enrollment;

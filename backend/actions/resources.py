@@ -1,10 +1,17 @@
-from core_ai import utils
+from core_ai import utils, CORE_CONTROLLER
 from fastapi import HTTPException
 
 
 def get_devices_internal():
     try:
-        return utils.get_all_devices()
+        devices = utils.get_all_devices()
+        models = CORE_CONTROLLER.get_available_models()
+        data_resp = {
+            "devices": devices,
+            "models": models
+        }
+        return {"status": True,
+                "data": data_resp}
     except:
         return HTTPException(status_code=500)
 # def set_configs_internal(req: ConfigRequest):

@@ -1,7 +1,5 @@
 {
-    "extractor_channel": 256,
-    "min_duration": 2,
-    "threshold": 0.5,
-    "device": "cpu",
+    "extractor_channel": 1024,
+    "device": "cuda:0",
     "root": "../"
 }

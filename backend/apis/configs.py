@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from actions import configs as cfgs
-from model_request import ConfigRequest
+from model.request import ConfigRequest
 config_router = APIRouter()
 
 

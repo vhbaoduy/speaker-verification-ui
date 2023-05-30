@@ -1,47 +1,77 @@
 from .extractors import get_extractor, get_model_path
-from .matching import compute_score
-from .utils import convert_bytes_to_array, process_data
+# from .matching import compute_score
+from .utils import convert_bytes_to_array
 from .local_config import Configs
-import asyncio
+from .preprocessing import DataPreprocessing
 import numpy as np
+import torch
+from typing import List
+import soundfile as sf
 
 class SpeakerVerification:
     def __init__ (self, 
-                  configs):
+                  configs: dict):
         self.configs = configs
-        path = get_model_path(configs["root"],configs["extractor_channel"])
+        path = get_model_path(configs["root"],
+                              configs["extractor_channel"])
         
         self.extractor = get_extractor(channel=configs["extractor_channel"],
-                                                  path=path,
-                                                  device=configs["device"])
-        self.threshold = configs["threshold"]
-        
+                                        path=path,
+                                        device=configs["device"])
+        self.threshold = Configs.THRESHOLD
+        self.preprocessor = DataPreprocessing(sampling_rate=Configs.SAMPLING_RATE,
+                                              duration=Configs.DURATION,
+                                              context_num_stack=Configs.NUM_STACK,
+                                              top_db=Configs.TOP_DB)
 
-    def extract_feature(self, wave_bytes):
-        data = np.array([])
+    def extract_features(self, wave_bytes:List[bytes]):
+        feats = []
+        # Process each file from client
         for wav in wave_bytes:
+            # Convert bytes from file to wav
             audio, _ = convert_bytes_to_array(wav, 
                                                 Configs.SAMPLING_RATE)
-            audio = process_data(audio, 
-                                    Configs.SAMPLING_RATE,
-                                    Configs.DURATION,
-                                    Configs.NUM_STACK)
-            print(audio.shape)
-            data = np.append(data, audio,axis=0)
+            
+            # Process audio
+            data1, data2 = self.preprocessor(audio)
+            # sf.write('temp.wav',data1[0],48000)
+            feat1 = self.extractor.extract_embedding(data1)
+            feat2 = self.extractor.extract_embedding(data2)
+            # Convert from tensor to numpy
+            # print(feat1.size())
+            feats.extend(feat1.detach().cpu().numpy())
+            feats.extend(feat2.detach().cpu().numpy())
         # data = np.array(data)
-        feats = self.extractor.extract_embedding(data)
+        feats = np.stack(feats,axis=0)
         return feats
     
-    def verify(self, wave_bytes, database):
-        feat = self.extract_feature(wave_bytes)
+    def compute_score(self,
+                    embedding1: np.ndarray,
+                    embedding2: np.ndarray):
+        '''
+            Compute similarity score between two embeddings
+            Args:
+                embeddings1: npdarray with N x 192
+                embedings2: npdarray with M x 192
+            
+            Return: Cosine score between two embeddings
+        '''
+        score = np.max(np.dot(
+                    embedding1, embedding2.T))
+        return score
+    
+    def verify(self, wav_data: bytes, database):
+        feat = self.extract_features([wav_data])
         results = []
         max_score = 0
         decision = False
         id = -1
-        for i in database:
-            embeddings = database[i]
-            accept, score = compute_score(feat, embeddings)
-            if accept:
+        for (i,feat_db) in enumerate(database):
+            # embeddings = database[i]
+            score = self.compute_score(feat, feat_db)
+            accept = False
+            if score > self.threshold:
+                accept = True
                 if score >= max_score:
                     max_score = score
                     id = i
@@ -51,5 +81,6 @@ class SpeakerVerification:
                 "score": score,
                 "id": i,
             })
+        # print(results)
         return (decision, max_score, id)
         

@@ -5,7 +5,7 @@ function Navbar() {
   return (
     <nav className="nav">
       <Link className="site-title">
-        <h3>Speaker Verification</h3>
+        <h3>Voice Authentication</h3>
       </Link>
       <ul>
         <CustomLink to="/">Home</CustomLink>
