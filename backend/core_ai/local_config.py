@@ -1,4 +1,5 @@
 class Configs:
+    ROOT = './'
     PATH_TO_CONFIG = './core_ai/configs.json'
     SAMPLING_RATE = 16000   # sampling rate 
     DURATION = 4    # audio length

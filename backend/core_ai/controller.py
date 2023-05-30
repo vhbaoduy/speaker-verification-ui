@@ -17,7 +17,7 @@ class CoreAIController:
     def get_available_models(self):
         models = []
         for channel in manager.MODEL_TYPES:
-            models.append({"channel": channel, "model_name":manager.MODEL_TYPES[channel]})
+            models.append({"id": channel, "name":manager.MODEL_TYPES[channel]})
         return models
     
     def get_available_channels(self):

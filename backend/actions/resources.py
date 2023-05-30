@@ -10,17 +10,7 @@ def get_devices_internal():
             "devices": devices,
             "models": models
         }
-        return {"status": True,
+        return {"success": True,
                 "data": data_resp}
     except:
         return HTTPException(status_code=500)
-# def set_configs_internal(req: ConfigRequest):
-#     if validation.check_valid_device(device=req.device) and \
-#         validation.check_channel_of_extractor(channel=req.channel) and \
-#         validation.check_threshold(threshold=req.threshold):
-#         CORE_CONTROLLER.update_config(req)
-#         return {"status": True,
-#                 "message": "Update configuration successfully!"}
-#     else:
-#         return {"status": False,
-#                 "message": "Update configuration failed!"}

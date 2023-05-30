@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import VoiceRecorder from "../components/VoiceRecorder";
-import "../styles/home.css";
-import "../styles/form.css";
+import "../styles/Enrollment.css";
 import axios from "axios";
 import Configs from "../configs";
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
-import Container from "react-bootstrap/Container"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Users from "../components/Users";
 import Notification from "../components/Notification";
-import { Button, Spinner } from "react-bootstrap";
+import { Button, Spinner, Row, Container, Col, Form } from "react-bootstrap";
 // import AudioRecorder from "../components/AudioRecorder";
 
 
@@ -117,32 +113,44 @@ function Enrollment() {
                 'Content-Type': 'multipart/form-data'
             }
         })
-        .then((res) => {return res.data})
-        .then((response)=>{
-            console.log(response)
-        })
-        .catch((error) => { console.log(error.message) })
+            .then((res) => { return res.data })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => { console.log(error.message) })
 
         resetForm()
     };
 
-    const resetForm = () =>{
+    const resetForm = () => {
         // const userElement = document.getElementById("username");
         // userElement.target.value = "";
         // const fileElement = document.getElementById("seletectedFiles");
         // fileElement.target.files = [];
+        const fileE = document.getElementById("selected-files")
+        fileE.files = {};
         setFiles([])
         setUser('')
     }
 
     const handleDeleteItem = (index) => {
-        const fileE = document.getElementById("selectedFiles")
-        fileE.target.value = "";
         const updatedFiles = [...files];
+        // console.log(files
+        const fileName = files[index].name;
+        const list = new DataTransfer();
+        const fileElement = document.getElementById("selected-files");
+        console.log(Array.from(fileElement.files))
+        Array.from(fileElement.files).forEach((file)=>{
+            if (!(file.name === fileName)){
+                list.items.add(file);
+            }
+        })
+        // document.getElementById("selected-files") = fileElement
+        fileElement.files = list.files;
+        // console.log(fileElement)
         updatedFiles.splice(index, 1);
         setFiles(updatedFiles);
     };
-
 
 
 
@@ -151,45 +159,86 @@ function Enrollment() {
             {/* <Notification message={"Clear audio successfuly"} type={"success"}></Notification> */}
             <Row>
                 <Col xs={12} md={8}>
-                    <div>
-                        <h1>Enrollment</h1>
-                        <p>Record or Upload 3 files to enroll the system</p>
-                        <center><VoiceRecorder addFiles={addBlobFromRecorderToForm} /></center>
-                        {/* <AudioRecorder/> */}
-                        <h2>Form submission</h2>
-                        <form>
-                            <div>
-                                <label>User name</label>
-                                <input id="username" type="text" onChange={setUserName} value={user}></input>
-                            </div>
-                            <div>
-                                <input id="seletectedFiles" type="file" multiple onChange={getFiles}></input>
-                            </div>
-
-                            {files.length > 0 &&
-                                <div>
-                                    <label>Recored Audio</label>
-                                    <div style={{ height: '250px', overflow: 'auto' }}>
-                                        {files.map((file, index) => (
-                                            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
-                                                <audio src={URL.createObjectURL(file)} controls></audio>
-                                                <Button variant="danger" onClick={() => { handleDeleteItem(index) }}>Delete</Button>
-                                            </div>
-                                        ))}
+                    <h1>Enrollment</h1>
+                    <p>Record or Upload 3 files to enroll the system</p>
+                    <small className="text-muted">Each file more than 3 seconds</small>
+                    <center><VoiceRecorder addFiles={addBlobFromRecorderToForm} /></center>
+                    {/* <AudioRecorder/> */}
+                    <Form>
+                        <h2>Submission</h2>
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="4">Username</Form.Label>
+                            <Col sm="8">
+                                <Form.Control type="text" onChange={setUserName} value={user} />
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                            {/* <Form.Label column sm="5"></Form.Label> */}
+                            <Form.Control type="file" id="selected-files" onChange={getFiles} multiple/>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="4">Recored/Selected Files</Form.Label>
+                            <Col sm="8">
+                                {files.length > 0 &&
+                                    <div>
+                                        <div style={{ height: '100px', overflow: 'auto' }}>
+                                            {files.map((file, index) => (
+                                                <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
+                                                    <audio src={URL.createObjectURL(file)} controls></audio>
+                                                    <Button variant="danger" onClick={() => { handleDeleteItem(index) }}>Delete</Button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            }
-                            <div>
+                                }
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="4">Totals</Form.Label>
+                            <Col sm="8">
+                                <Form.Label column sm="4"> <b>{files.length}</b></Form.Label>
+                                {/* <Form.Control type="file" onChange={getFiles} multiple/> */}
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                            <Col sm="12">
                                 <Button onClick={handleSubmit} variant="primary">Enroll</Button>
-                            </div>
+                            </Col>
+                        </Form.Group>
+                    </Form>
 
-                        </form>
-                    </div>
+                    {/* <form>
+                        <div>
+                            <label>User name</label>
+                            <input id="username" type="text" onChange={setUserName} value={user}></input>
+                        </div>
+                        <div>
+                            <input id="seletectedFiles" type="file" multiple onChange={getFiles}></input>
+                        </div>
+
+                        {files.length > 0 &&
+                            <div>
+                                <label>Recored Audio</label>
+                                <div style={{ height: '200px', overflow: 'auto' }}>
+                                    {files.map((file, index) => (
+                                        <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
+                                            <audio src={URL.createObjectURL(file)} controls></audio>
+                                            <Button variant="danger" onClick={() => { handleDeleteItem(index) }}>Delete</Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        }
+                        <div>
+                            <Button onClick={handleSubmit} variant="primary">Enroll</Button>
+                        </div>
+
+                    </form> */}
                 </Col>
 
                 <Col xs={6} md={4}>
                     <h1>Enrolled users</h1>
-                    <Users/>
+                    <Users />
                 </Col>
             </Row>
             {notification && (

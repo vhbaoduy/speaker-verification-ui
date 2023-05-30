@@ -20,6 +20,7 @@ MODEL_TYPES = {
     256:'ECAPA-TDNN-256',
     128:'ECAPA-TDNN-128'
 }
+FOLDER = 'downloaded_models'
 
 def get_extractor(channel,
                   path,
@@ -45,19 +46,19 @@ def check_pretrained_models(root,channel):
     '''
         Check pretrained model in 'root'/models and download
     '''
-    path = os.path.join(root,'models')
+    path = os.path.join(root,FOLDER)
     if not os.path.exists(path):
         os.mkdir(path)
         download_model(path,channel)
     else:
-        files = glob.glob(os.path.join(root, 'models/ecapa-tdnn-%s.model'%channel))
+        files = glob.glob(os.path.join(root, FOLDER,'ecapa-tdnn-%s.model'%channel))
         if len(files) == 0:
             download_model(path,channel)
 
 
 def download_model(root,channel):
     '''
-        Download models to $rooot/models
+        Download models to $root/models
     '''
     url = URLS[channel]
     name = 'ecapa-tdnn-%s.model' % channel
@@ -65,7 +66,7 @@ def download_model(root,channel):
 
 
 def get_model_path(root,channel):
-    path = os.path.join(root, 'models/ecapa-tdnn-%s.model'%channel)
+    path = os.path.join(root, FOLDER,'ecapa-tdnn-%s.model'%channel)
     files = glob.glob(path)
     if len(files) == 0:
         # print("Hello bug")
