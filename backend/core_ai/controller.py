@@ -11,7 +11,7 @@ class CoreAIController:
         self.set_up()
 
     def set_up(self):
-        manager.download_all_models(self.configs['root'])
+        manager.download_all_models(Configs.ROOT)
         self.creat_AI_instance()
 
     def get_available_models(self):

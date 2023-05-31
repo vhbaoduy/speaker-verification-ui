@@ -128,7 +128,7 @@ function Enrollment() {
         // const fileElement = document.getElementById("seletectedFiles");
         // fileElement.target.files = [];
         const fileE = document.getElementById("selected-files")
-        fileE.files = {};
+        fileE.files = new DataTransfer().files
         setFiles([])
         setUser('')
     }
@@ -140,8 +140,8 @@ function Enrollment() {
         const list = new DataTransfer();
         const fileElement = document.getElementById("selected-files");
         console.log(Array.from(fileElement.files))
-        Array.from(fileElement.files).forEach((file)=>{
-            if (!(file.name === fileName)){
+        Array.from(fileElement.files).forEach((file) => {
+            if (!(file.name === fileName)) {
                 list.items.add(file);
             }
         })
@@ -173,8 +173,11 @@ function Enrollment() {
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row}>
+                            <Col sm="12">
+                                <Form.Control type="file" id="selected-files" onChange={getFiles} multiple />
+
+                            </Col>
                             {/* <Form.Label column sm="5"></Form.Label> */}
-                            <Form.Control type="file" id="selected-files" onChange={getFiles} multiple/>
                         </Form.Group>
                         <Form.Group as={Row}>
                             <Form.Label column sm="4">Recored/Selected Files</Form.Label>

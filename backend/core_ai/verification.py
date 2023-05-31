@@ -12,10 +12,10 @@ class SpeakerVerification:
     def __init__ (self, 
                   configs: dict):
         self.configs = configs
-        path = get_model_path(configs["root"],
-                              configs["extractor_channel"])
+        path = get_model_path(Configs.ROOT,
+                              configs["model"])
         
-        self.extractor = get_extractor(channel=configs["extractor_channel"],
+        self.extractor = get_extractor(channel=configs["model"],
                                         path=path,
                                         device=configs["device"])
         self.threshold = Configs.THRESHOLD
@@ -34,7 +34,7 @@ class SpeakerVerification:
             
             # Process audio
             data1, data2 = self.preprocessor(audio)
-            # sf.write('temp.wav',data1[0],48000)
+            sf.write('temp.wav',data1[0],16000)
             feat1 = self.extractor.extract_embedding(data1)
             feat2 = self.extractor.extract_embedding(data2)
             # Convert from tensor to numpy
@@ -81,6 +81,6 @@ class SpeakerVerification:
                 "score": score,
                 "id": i,
             })
-        # print(results)
-        return (decision, max_score, id)
+        print(results)
+        return (decision, float(max_score), id)
         

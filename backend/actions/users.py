@@ -101,18 +101,24 @@ async def verify_user_interal(data: UploadFile):
         enrolled_embedding = pickle.loads(user["features"])
         feat_db.append(enrolled_embedding)
     # print(feat_db)
-    result = CORE_CONTROLLER.instance.verify(wav_bytes,feat_db)
-    
-    # return {
-    #     "status": True,
-    #     "message": "OK",
-    #     "data": result
-    #     # "code": ErrorStatusCode.ERROR_INTERNAL
-    # }
+    try:
+        decision, score, _ = CORE_CONTROLLER.instance.verify(wav_bytes,feat_db)
+        print(decision, score)
+        return {
+            "status": True,
+            "message": "OK",
+            "data": {
+                "accept": decision,
+                "score": score
+            }
+            # "code": ErrorStatusCode.ERROR_INTERNAL
+        }
 
-    # except Exception as e:
-    #     print(e)
-    #     print(traceback.format_exc())
+    except Exception as e:
+        print(e)
+        print(traceback.format_exc())
+
+
     return {
         "success": False,
         "message": "Error internal",
