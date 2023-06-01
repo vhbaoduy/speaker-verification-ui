@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Configs from "../configs";
-// import "../styles/form.css"
 import "../styles/Setting.css"
 import axios from "axios";
-// import Row from "react-bootstrap/Row"
-// import Col from "react-bootstrap/Col"
-// import Container from "react-bootstrap/Container"
 import { Form, Row, Col, Container } from 'react-bootstrap';
 
-// Bootstrap CSS
-// import "bootstrap/dist/css/bootstrap.min.css";
-// Bootstrap Bundle JS
-// import "bootstrap/dist/js/bootstrap.bundle.min";
 
 
 function Setting() {
@@ -19,31 +11,56 @@ function Setting() {
     const [resources, setResources] = useState();
     const [configs, setConfigs] = useState();
     useEffect(() => {
-        fetchResources()
+        fetchData();
+        // fetchConfigs();
+        // console.log(resources);
+        // console.log(configs)
     }, [])
 
-    const fetchResources = async () => {
+
+    const fetchData = async () => {
         await axios({
-            url: Configs.API_URL + '/resources',
+            url: Configs.API_URL + '/configs',
             method: "GET"
         })
             .then((res) => { return res.data })
             .then((res) => {
                 console.log(res)
                 if (res.success) {
-                    setResources(res.data);
+                    setResources(res.data.resources);
+                    setConfigs(res.data.config)
                 }
             })
             .catch((error) => {
                 console.log(error.message)
             })
     }
-
-    const fetchConfigs = async () => {
-
-    }
-    const handleSubmit = () => {
-
+    const handleConfigChange = (fieldName, value) => {
+        setConfigs({
+          ...configs,
+          [fieldName]: value});
+        // console.log(configs)
+      };
+    const handleSubmit = async(e) => {
+        e.preventDefault()
+        if (0<configs.threshold && configs.threshold< 1){
+            console.log(configs)
+            await axios({
+                url: Configs.API_URL + '/configs',
+                method: "POST",
+                data: configs
+            })
+                .then((res) => { return res.data })
+                .then((res) => {
+                    console.log(res)
+                    if (res.success) {
+                        
+                    }
+                })
+                .catch((error) => {
+                    console.log(error.message)
+                })
+        }
     }
 
     return (
@@ -61,7 +78,7 @@ function Setting() {
                                 <small className="text-muted">Available devices from server</small>
                             </div>
                             <Col sm="10">
-                                <Form.Control as="select">
+                                <Form.Control as="select" value={configs && configs["device"]} onChange={(event) => {handleConfigChange("device", event.target.value)}}>
                                     {resources && resources['devices'].map((list, _) => (<option value={list.id}>{list.name}</option>))}
                                 </Form.Control>
                             </Col>
@@ -72,7 +89,7 @@ function Setting() {
                                 <small className="text-muted">Available models from server</small>
                             </div>
                             <Col sm="10">
-                                <Form.Control as="select">
+                                <Form.Control as="select" value={configs && configs["model"]} onChange={(event) => {handleConfigChange("model", parseInt(event.target.value))}}>
                                     {resources && resources['models'].map((list, _) => (<option value={list.id}>{list.name}</option>))}
                                 </Form.Control>
                             </Col>
@@ -84,14 +101,14 @@ function Setting() {
                                 <small className="text-muted">Score threshold for matching in the system</small>
                             </div>
                             <Col sm="10">
-                                <Form.Control type="text" />
+                                <Form.Control type="text" value={configs && configs["threshold"]} onChange={(event) => {handleConfigChange("threshold", parseFloat(event.target.value))}}/>
                             </Col>
                         </Form.Group>
 
 
                         <Form.Group as={Row}>
                             <Col sm="10">
-                                <button type="submit" className="btn btn-primary">Save</button>
+                                <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Save</button>
                             </Col>
                         </Form.Group>
                     </Form>
@@ -99,36 +116,6 @@ function Setting() {
                 <Col></Col>
             </Row>
         </Container>
-
-
-        // <Container>
-        //     <Row>
-        //         <Col>
-        //             <h1>Setting</h1>
-        //             <div>
-        //                 <form>
-        //                     <div>
-        //                         <label>Available Devices</label>
-        //                         <select>
-        //                             {resources && resources['devices'].map((list, _) => (<option value={list.id}>{list.name}</option>))}
-        //                         </select>
-        //                     </div>
-        //                     <div>
-        //                         <label>Model</label>
-        //                         <select>
-        //                             {resources && resources['models'].map((list,_) => (<option value={list.id}>{list.name}</option>))}
-        //                         </select>
-        //                     </div>
-        //                     <div>
-        //                         <label>Threshold</label>
-
-        //                     </div>
-        //                     <Button>Save</Button>
-        //                 </form>
-        //             </div>
-        //         </Col>
-        //     </Row>
-        // </Container>
 
 
     );

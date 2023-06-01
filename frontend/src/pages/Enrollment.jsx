@@ -1,22 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VoiceRecorder from "../components/VoiceRecorder";
 import "../styles/Enrollment.css";
 import axios from "axios";
 import Configs from "../configs";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Users from "../components/Users";
 import Notification from "../components/Notification";
-import { Button, Spinner, Row, Container, Col, Form } from "react-bootstrap";
-// import AudioRecorder from "../components/AudioRecorder";
+import { Button, Spinner, Row, Container, Col, Form, Modal } from "react-bootstrap";
 
 
 
 function Enrollment() {
+    // Enrollments
     const [notification, setNotification] = useState(null);
     const [user, setUser] = useState('')
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    // const [audioUrls, setAudioUrls] = useState([])
+
+    // Fetch users from database
+    const [usersDB, setUsersDB] = useState([]);
+    useEffect(() => {
+        fetchUserData();
+    }, [])
 
     const resetNotification = () => {
         setNotification(null);
@@ -41,21 +45,17 @@ function Enrollment() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // console.log(`Start submit ${JSON.stringify(formData)}`);
-
-        // console.log(`Start submit ${JSON.stringify(formData)}`)
-        // const audios = audioUrls;
         const data = new FormData();
-        // console.log(audioUrls);
-        // if (!audioUrls && !audioUrls.length) {
-        //     alert('Audios not found');
-        // }
+
         // Check username
         if (user === '') {
-            alert("Username is empty!");
+            setNotification({
+                message: "Username is empty!",
+                type: "danger"
+            })
             return;
         }
-        if (files.length == 0) {
+        if (files.length === 0) {
             setNotification({
                 message: "Voice not found!",
                 type: "danger"
@@ -63,48 +63,13 @@ function Enrollment() {
             // alert("Not found voice to enroll!");
             return;
         }
-        // const audioData = [];
-        // console.log(`Before loop: `, audioData)
-
         if (files.length > 0) {
             await files.forEach(async (file) => {
                 data.append('data', file);
             })
         }
-
-        // if (audioUrls.length > 0) {
-        //     const audios = await Promise.all(
-        //         audioUrls.map(
-        // async (aUrl, i) => {
-        //     const res = await axios({
-        //         url: aUrl,
-        //         method: "GET",
-        //         responseType: "blob"
-        //     })
-        //     console.log(res.data)
-
-        //     const audioFile = new File([res.data], `voice-${i}.wav`, {
-        //         type: 'audio/wav',
-        //     });
-
-
-        //     return audioFile
-        //     //     // console.log(audioFile);
-        //     // data.append('data', audioFile);
-        // }
-        //         )
-        //     )
-
-        //     console.log(audios);
-        //     audios.forEach(audio =>
-        //         data.append("data", audio)
-        //     )
-
-
-        // }
-        // console.log('files', files)
         data.append("user", user);
-
+        setLoading(true);
         await axios({
             url: Configs.API_URL + '/users',
             method: "POST",
@@ -115,33 +80,58 @@ function Enrollment() {
         })
             .then((res) => { return res.data })
             .then((response) => {
-                console.log(response)
+                // console.log(response)
+                if (response.success) {
+                    setNotification({
+                        message: `Enroll user ${user} successfully !`,
+                        type: "sucess"
+                    })
+                    resetForm()
+                    fetchUserData()
+                } else {
+                    if (response.code[0] === Configs.ERROR_CODE.EXISTED_USER) {
+                        setNotification({
+                            message: `Enroll user ${user} failed, the user is existed in system`,
+                            type: "danger"
+                        })
+                    } else if (response.code[0] === Configs.ERROR_CODE.ERROR_INTERNAL) {
+                        setNotification({
+                            message: `Error from internal server !`,
+                            type: "danger"
+                        })
+                    } else {
+                        setNotification({
+                            message: `Enroll user ${user} failed ! Assure your data as requested`,
+                            type: "sucess"
+                        })
+                        resetForm()
+                        fetchUserData()
+                    }
+                }
             })
-            .catch((error) => { console.log(error.message) })
-
-        resetForm()
+            .catch((error) => { setNotification({
+                message: `Error from internal server !`,
+                type: "danger"
+            }) })
+        setLoading(false);
     };
 
     const resetForm = () => {
-        // const userElement = document.getElementById("username");
-        // userElement.target.value = "";
-        // const fileElement = document.getElementById("seletectedFiles");
-        // fileElement.target.files = [];
         const fileE = document.getElementById("selected-files")
-        fileE.files = {};
+        fileE.files = new DataTransfer().files
         setFiles([])
         setUser('')
     }
 
-    const handleDeleteItem = (index) => {
+    const handleDeleteAudioFile = (index) => {
         const updatedFiles = [...files];
         // console.log(files
         const fileName = files[index].name;
         const list = new DataTransfer();
         const fileElement = document.getElementById("selected-files");
-        console.log(Array.from(fileElement.files))
-        Array.from(fileElement.files).forEach((file)=>{
-            if (!(file.name === fileName)){
+        // console.log(Array.from(fileElement.files))
+        Array.from(fileElement.files).forEach((file) => {
+            if (!(file.name === fileName)) {
                 list.items.add(file);
             }
         })
@@ -152,32 +142,82 @@ function Enrollment() {
         setFiles(updatedFiles);
     };
 
+    const fetchUserData = async () => {
+        await axios({
+            url: Configs.API_URL + '/users',
+            method: "GET"
+        })
+            .then((res) => { return res.data; })
+            .then((data) => {
+                setUsersDB(data.data);
+            })
+            .catch((error) => {
+                console.log(error.message)
+            })
+
+    }
+    const handleDeleteUser = async (index) => {
+        const userDelete = usersDB[index];
+        await axios({
+            url: Configs.API_URL + `/users/${userDelete}`,
+            method: "DELETE"
+        })
+            .then((res) => {
+                if (res.data.success) {
+                    // alert(`Delete ${userDelete} successfully!`)
+                    setNotification({
+                        message: `Delete ${userDelete} successfully!`,
+                        type: "success"
+                    })
+                } else {
+                    // alert(`Delete ${userDelete} Failed!`)
+                    setNotification({
+                        message: `Delete ${userDelete} Failed!`,
+                        type: "danger"
+                    })
+                }
+            })
+            .catch((error) => {
+                setNotification({
+                    message: `Error from internal server !`,
+                    type: "danger"
+                })
+            })
+        fetchUserData();
+    }
 
 
     return (
         <Container>
             {/* <Notification message={"Clear audio successfuly"} type={"success"}></Notification> */}
             <Row>
-                <Col xs={12} md={8}>
+                <Col md={8}>
                     <h1>Enrollment</h1>
                     <p>Record or Upload 3 files to enroll the system</p>
                     <small className="text-muted">Each file more than 3 seconds</small>
-                    <center><VoiceRecorder addFiles={addBlobFromRecorderToForm} /></center>
-                    {/* <AudioRecorder/> */}
+                    <VoiceRecorder addFiles={addBlobFromRecorderToForm} />
+
                     <Form>
                         <h2>Submission</h2>
                         <Form.Group as={Row}>
                             <Form.Label column sm="4">Username</Form.Label>
-                            <Col sm="8">
+                            <Col sm="6">
                                 <Form.Control type="text" onChange={setUserName} value={user} />
                             </Col>
+                            <Col sm="2"></Col>
                         </Form.Group>
-                        <Form.Group as={Row}>
+                        <Form.Group as={Row} className="p-2">
+                            <Col sm="4">
+                                <Form.Control type="file" id="selected-files" onChange={getFiles} multiple />
+                            </Col>
+
+                            {/* 
+                            <Col sm="4">
+                            </Col> */}
                             {/* <Form.Label column sm="5"></Form.Label> */}
-                            <Form.Control type="file" id="selected-files" onChange={getFiles} multiple/>
                         </Form.Group>
-                        <Form.Group as={Row}>
-                            <Form.Label column sm="4">Recored/Selected Files</Form.Label>
+                        <Form.Group as={Row} >
+                            <Form.Label column sm="4">Recorded/Selected Files</Form.Label>
                             <Col sm="8">
                                 {files.length > 0 &&
                                     <div>
@@ -185,7 +225,7 @@ function Enrollment() {
                                             {files.map((file, index) => (
                                                 <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
                                                     <audio src={URL.createObjectURL(file)} controls></audio>
-                                                    <Button variant="danger" onClick={() => { handleDeleteItem(index) }}>Delete</Button>
+                                                    <Button variant="danger" onClick={() => { handleDeleteAudioFile(index) }}>Delete</Button>
                                                 </div>
                                             ))}
                                         </div>
@@ -197,7 +237,6 @@ function Enrollment() {
                             <Form.Label column sm="4">Totals</Form.Label>
                             <Col sm="8">
                                 <Form.Label column sm="4"> <b>{files.length}</b></Form.Label>
-                                {/* <Form.Control type="file" onChange={getFiles} multiple/> */}
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row}>
@@ -206,49 +245,42 @@ function Enrollment() {
                             </Col>
                         </Form.Group>
                     </Form>
-
-                    {/* <form>
-                        <div>
-                            <label>User name</label>
-                            <input id="username" type="text" onChange={setUserName} value={user}></input>
-                        </div>
-                        <div>
-                            <input id="seletectedFiles" type="file" multiple onChange={getFiles}></input>
-                        </div>
-
-                        {files.length > 0 &&
-                            <div>
-                                <label>Recored Audio</label>
-                                <div style={{ height: '200px', overflow: 'auto' }}>
-                                    {files.map((file, index) => (
-                                        <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
-                                            <audio src={URL.createObjectURL(file)} controls></audio>
-                                            <Button variant="danger" onClick={() => { handleDeleteItem(index) }}>Delete</Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        }
-                        <div>
-                            <Button onClick={handleSubmit} variant="primary">Enroll</Button>
-                        </div>
-
-                    </form> */}
                 </Col>
 
-                <Col xs={6} md={4}>
+                <Col md={4}>
                     <h1>Enrolled users</h1>
-                    <Users />
+                    <div style={{ height: '400px', overflow: 'auto' }}>
+                        {usersDB.map((user, index) => (
+                            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
+                                <span style={{ marginRight: '10px' }}>{user}</span>
+                                <Button variant="danger" onClick={() => handleDeleteUser(index)}>Delete</Button>
+                            </div>
+                        ))}
+                    </div>
                 </Col>
             </Row>
             {notification && (
-                <Notification message={notification.message} type={notification.type} />
+                <Notification message={notification.message} type={notification.type} onClose={resetNotification} />
             )}
-            {/* {loading ? (
-                <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-                </Spinner>
-            ):console.log("Hello")} */}
+
+            {loading && (
+                <Modal
+                    show={loading}
+                    centered
+                    backdrop="static"
+                    keyboard={false}
+                    contentClassName="loading-modal"
+                >
+                    <Modal.Body>
+                        <div className="text-center">
+                            <Spinner animation="border" role="status" variant="primary">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                            <p className="mt-2">Please wait while the data is being processed</p>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            )}
         </Container>
 
 

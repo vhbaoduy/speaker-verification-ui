@@ -1,11 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
-
+import React from 'react';
 import MyNavbar from './components/Navbar';
 import Home from './pages/Home'
 import Setting from './pages/Setting'
 import About from './pages/About'
-import { BrowserRouter, Routes, Route, Form } from "react-router-dom";
+import {Routes, Route } from "react-router-dom";
 import Enrollment from './pages/Enrollment';
 import Authentication from './pages/Authentication';
 import "./index.css"

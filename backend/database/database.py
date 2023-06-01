@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from core_ai import get_default_config
 
 DB_URL = "mongodb://localhost:27017"
 
@@ -9,7 +10,6 @@ def get_database():
 def get_collection(db_connection,collection_name):
     return db_connection[collection_name]
 
+# Get DB connection
 db_instance = get_database()
-user_db = get_collection(db_instance,"users")
-config_db = get_database(db_instance,"configs")
-user_testing_db = get_collection(db_instance, "users_testing")
+

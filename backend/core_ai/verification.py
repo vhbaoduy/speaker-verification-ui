@@ -1,10 +1,9 @@
 from .extractors import get_extractor, get_model_path
 # from .matching import compute_score
 from .utils import convert_bytes_to_array
-from .local_config import Configs
+from .configs import Configs
 from .preprocessing import DataPreprocessing
 import numpy as np
-import torch
 from typing import List
 import soundfile as sf
 
@@ -12,13 +11,13 @@ class SpeakerVerification:
     def __init__ (self, 
                   configs: dict):
         self.configs = configs
-        path = get_model_path(configs["root"],
-                              configs["extractor_channel"])
+        path = get_model_path(Configs.ROOT,
+                              configs["model"])
         
-        self.extractor = get_extractor(channel=configs["extractor_channel"],
+        self.extractor = get_extractor(channel=configs["model"],
                                         path=path,
                                         device=configs["device"])
-        self.threshold = Configs.THRESHOLD
+        self.threshold = configs["threshold"]
         self.preprocessor = DataPreprocessing(sampling_rate=Configs.SAMPLING_RATE,
                                               duration=Configs.DURATION,
                                               context_num_stack=Configs.NUM_STACK,
@@ -34,7 +33,7 @@ class SpeakerVerification:
             
             # Process audio
             data1, data2 = self.preprocessor(audio)
-            # sf.write('temp.wav',data1[0],48000)
+            sf.write('temp.wav',data1[0],16000)
             feat1 = self.extractor.extract_embedding(data1)
             feat2 = self.extractor.extract_embedding(data2)
             # Convert from tensor to numpy
@@ -60,7 +59,9 @@ class SpeakerVerification:
                     embedding1, embedding2.T))
         return score
     
-    def verify(self, wav_data: bytes, database):
+    def verify(self, 
+               wav_data: bytes, 
+               database: List[np.ndarray]):
         feat = self.extract_features([wav_data])
         results = []
         max_score = 0
@@ -81,6 +82,6 @@ class SpeakerVerification:
                 "score": score,
                 "id": i,
             })
-        # print(results)
-        return (decision, max_score, id)
+        print(results)
+        return (decision, float(max_score), id)
         
