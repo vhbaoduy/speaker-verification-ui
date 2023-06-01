@@ -44,6 +44,9 @@ class DataPreprocessing(object):
     def reduce_noise(self, data):
         '''
             Reduce noise of audio data
+            Args: 
+                data: audio from np.ndarray
+            Return: data reduced noise
         '''
         reduced_noise =  nr.reduce_noise(y=data, 
                                 sr=self.sr,
@@ -52,7 +55,10 @@ class DataPreprocessing(object):
     
     def remove_silence(self, audio):
         '''
-            Remove silence in data
+            Remove silence in begining and ending of ta
+            Args: 
+                audio: audio from np.ndarray
+            Return: data reduced silence
         '''
         audio_trim,_ = librosa.effects.trim(audio, top_db=self.top_db)
         return np.array(audio_trim)
@@ -60,6 +66,9 @@ class DataPreprocessing(object):
     def process_data(self,audio):
         '''
             Process data as input of extractor
+            Args:
+                audio: audio from np.ndaraay
+            Return: processed audio
         '''
         # Append original data
         data1  = np.stack([audio], axis=0).astype(np.float32)

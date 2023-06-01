@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Modal, Alert } from 'react-bootstrap';
 
-const Notification = ({ message, type, onClose }) => {
+
+
+const Notification = ({ message, type, onClose, note }) => {
   const [show, setShow] = useState(true);
 
   const handleClose = () => {
     setShow(false);
     onClose();
   };
-
-//   const handleShow = () => {
-//     setShow(true);
-//   };
 
   const getVariant = () => {
     switch (type) {
@@ -36,6 +34,7 @@ const Notification = ({ message, type, onClose }) => {
         </Modal.Header>
         <Modal.Body>
           <Alert variant={variant}>{message}</Alert>
+          {note && (<p>{note}</p>)}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

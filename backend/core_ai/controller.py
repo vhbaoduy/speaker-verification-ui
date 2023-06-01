@@ -14,12 +14,22 @@ class CoreAIController:
         self.set_up()
 
     def set_up(self):
+        '''
+            Download all models and create instance for verification
+        '''
         manager.download_all_models(Configs.ROOT)
         self.creat_AI_instance()
 
+    
+    def get_config(self):
+        '''
+            Get current configs of controller
+        '''
+        return self.configs
+
     def get_available_models(self):
         '''
-            Get all models
+            Get all available models from server
         '''
         models = []
         for channel in manager.MODEL_TYPES:
@@ -28,7 +38,7 @@ class CoreAIController:
     
     def get_available_devices(self):
         '''
-            Get all available device
+            Get all available devices
         '''
         devices = [{
             'id': 'cpu', 'name': 'CPU'
@@ -49,9 +59,6 @@ class CoreAIController:
                 })
         return devices
     
-    def get_available_channels(self):
-        return manager.MODEL_TYPES.keys()
-
     
     def check_instance(self):
         '''
@@ -59,7 +66,7 @@ class CoreAIController:
         '''
         return self.instance is not None
 
-    def update_config(self, new_configs):
+    def update_config(self, new_configs:dict):
         '''
             Update configs
         '''

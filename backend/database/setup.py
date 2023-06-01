@@ -16,12 +16,18 @@ user_testing_db = get_collection(db_instance, "users_testing")
 config_db = get_collection(db_instance,"configs")
 
 def init_default_config():
+    '''
+        Init default config of system
+    '''
     cursor = config_db.find_one({"type": CONFIG_TYPE["default"]})
     if cursor is None:
         config_db.insert_one({"type": CONFIG_TYPE["default"],
                             "configs": get_default_config()})
 
 def get_config():
+    '''
+        Get configs to response the client. Return the config of user if it is existed or return the default config
+    '''
     configs = config_db.find_one({"type":CONFIG_TYPE["user"]})
     if configs is not None:
         return configs["configs"]

@@ -62,6 +62,17 @@ class SpeakerVerification:
     def verify(self, 
                wav_data: bytes, 
                database: List[np.ndarray]):
+        '''
+            Verify the user with all users in database
+            Args:
+                wav_data: bytes from user
+                database: list of feature of enrolled users
+            Return:
+                decision: accept/reject user
+                max_score: similarity score between attemp user and users in database
+                id: id of user in list
+                threshold: current threshold to consider
+        '''
         feat = self.extract_features([wav_data])
         results = []
         max_score = 0
@@ -70,18 +81,15 @@ class SpeakerVerification:
         for (i,feat_db) in enumerate(database):
             # embeddings = database[i]
             score = self.compute_score(feat, feat_db)
-            accept = False
-            if score > self.threshold:
-                accept = True
-                if score >= max_score:
-                    max_score = score
-                    id = i
-                decision = True
+            if score >= max_score:
+                max_score = score
+                id = i
             results.append({
-                "accept": accept,
                 "score": score,
                 "id": i,
             })
+        if max_score > self.threshold:
+            decision = True
         print(results)
-        return (decision, float(max_score), id)
+        return (decision, float(max_score), id, self.threshold)
         

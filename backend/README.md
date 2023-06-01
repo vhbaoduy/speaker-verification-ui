@@ -13,3 +13,9 @@ Build the main flow of the system from data preprocessing to the final decision 
 ## Model
 Define model for request and error code in server side
 
+
+## How to install
+`python main.py`
+
+
+

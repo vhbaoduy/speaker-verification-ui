@@ -17,7 +17,7 @@ function VoiceRecorder({ addFiles }) {
 		<Container>
 			<Row>
 				<Col>
-					<center className="p-2"><AudioRecorder
+					<center className="p-1"><AudioRecorder
 						onRecordingComplete={(blob) => addAudioElement(blob)}
 						recorderControls={recorderControls}
 						audioTrackConstraints={{

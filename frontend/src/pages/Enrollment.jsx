@@ -206,7 +206,7 @@ function Enrollment() {
                             </Col>
                             <Col sm="2"></Col>
                         </Form.Group>
-                        <Form.Group as={Row} className="p-2">
+                        <Form.Group as={Row} className="p-1">
                             <Col sm="4">
                                 <Form.Control type="file" id="selected-files" onChange={getFiles} multiple />
                             </Col>

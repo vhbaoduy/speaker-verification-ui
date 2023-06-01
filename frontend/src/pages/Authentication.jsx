@@ -54,7 +54,25 @@ function Authentication() {
             .then((res) => { return res.data})
             .then((data)=>{
                 if (data.success){
-
+                    const results = data.data;
+                    console.log(results);
+                    const note = `(You must get at least ${(parseFloat(results.threshold)*100).toFixed(2)}% to passed the system)`;
+                    const percent = (parseFloat(results.score)*100).toFixed(2);
+                    if (results.accept){
+                        setNotification({
+                            "type": "success",
+                            "message": `You are ${percent}% similar to user ${results.user}.
+                                        You passed the system`,
+                            "note": note
+                        })
+                    }else{
+                        setNotification({
+                            "type": "danger",
+                            "message": `You are ${percent}% similar to user in database.
+                                        You did not pass the system`,
+                            "note": note
+                        })
+                    }
                 }else{
                     if (data.code[0] === Configs.ERROR_CODE.USER_NOT_FOUND){
                         setNotification({
@@ -70,6 +88,8 @@ function Authentication() {
     };
     const handleDeleteItem = () => {
         setFile(null);
+        const fileElement = document.getElementById("selected-file");
+        fileElement.files = new DataTransfer().files;
     };
 
     return (
@@ -81,7 +101,7 @@ function Authentication() {
                     <center><VoiceRecorder addFiles={addBlobFromRecorderToForm} /></center>
                     <Form.Group as={Row} >
                         <Col sm="8">
-                            <Form.Control type="file" onChange={getFile} />
+                            <Form.Control type="file" onChange={getFile} id="selected-file"/>
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row}>
@@ -93,7 +113,7 @@ function Authentication() {
                                         {file && (
                                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
                                                 <audio src={URL.createObjectURL(file)} controls></audio>
-                                                <Button variant="danger" onClick={() => { handleDeleteItem() }}>Delete</Button>
+                                                <Button variant="danger" onClick={() => { handleDeleteItem()}}>Delete</Button>
                                             </div>
                                         )}
                                     </div>
@@ -110,7 +130,7 @@ function Authentication() {
                 <Col></Col>
             </Row>
             {notification && (
-                <Notification message={notification.message} type={notification.type} onClose={resetNotification} />
+                <Notification message={notification.message} type={notification.type}  note={notification.note} onClose={resetNotification} />
             )}
             {loading && (
                 <Modal
@@ -125,7 +145,7 @@ function Authentication() {
                             <Spinner animation="border" role="status" variant="primary">
                                 <span className="visually-hidden">Loading...</span>
                             </Spinner>
-                            <p className="mt-2">Please wait while the data is being processed</p>
+                            <p className="mt-2">Authenticating</p>
                         </div>
                     </Modal.Body>
                 </Modal>

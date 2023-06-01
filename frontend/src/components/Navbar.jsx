@@ -1,12 +1,15 @@
 import { Link, useMatch, useResolvedPath } from "react-router-dom"
+import React from "react"
 
 import "../styles/Navbar.css"
 
 function Navbar() {
   return (
     <nav className="nav">
-      <Link className="site-title">
-        <h3>Voice Authentication</h3>
+      <Link className="site-title" to="/">
+          <ul>
+          Voice Authentication
+          </ul>
       </Link>
       <ul>
         <CustomLink to="/">Home</CustomLink>

@@ -40,12 +40,12 @@ def convert_bytes_to_array(wav_bytes,sr):
     
     return data, sample_rate
 
-def read_config(path):
-    configs = json.load(open(path, 'r'))
-    for type_conf in configs:
-        if type_conf != "default":
-            return configs[type_conf]
-    return configs["default"]
+# def read_config(path):
+#     configs = json.load(open(path, 'r'))
+#     for type_conf in configs:
+#         if type_conf != "default":
+#             return configs[type_conf]
+#     return configs["default"]
 
-def write_config(configs, path):
-    return json.dump(configs, open(path, 'w'))
+# def write_config(configs, path):
+#     return json.dump(configs, open(path, 'w'))
