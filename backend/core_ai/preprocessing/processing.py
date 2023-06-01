@@ -29,6 +29,7 @@ class DataPreprocessing(object):
         self.sr = sampling_rate
         self.length = sampling_rate * duration + 240 # Calculate time of audio
         self.num_stack = context_num_stack
+        self.top_db = top_db
 
 
     def __call__(self,data):
@@ -49,16 +50,11 @@ class DataPreprocessing(object):
                                 stationary=False)
         return reduced_noise
     
-    def remove_silence(self, audio, top_db=10):
+    def remove_silence(self, audio):
         '''
             Remove silence in data
         '''
-        audio_trim,_ = librosa.effects.trim(audio, top_db=top_db)
-        # wav_data = []
-        # for c in clips:
-        #     # print(c)
-        #     data = audio[c[0]: c[1]]
-        #     wav_data.extend(data)
+        audio_trim,_ = librosa.effects.trim(audio, top_db=self.top_db)
         return np.array(audio_trim)
     
     def process_data(self,audio):

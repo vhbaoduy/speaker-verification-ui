@@ -3,10 +3,9 @@ from .extractor import EmbeddingExtractor
 from ..utils import LOG
 import glob
 import gdown
-import asyncio
 '''
     - All models are pretrained from https://github.com/TaoRuijie/ECAPA-TDNN with different configuration.
-    - Get models from my thesis.
+    - Get models from my thesis .
 '''
 URLS={
     128: 'https://drive.google.com/file/d/1k2XNHlfa9IgzLbGnvRdrQFufbXc44wex/view?usp=sharing',
@@ -20,17 +19,19 @@ MODEL_TYPES = {
     256:'ECAPA-TDNN-256',
     128:'ECAPA-TDNN-128'
 }
+
+# Define model to storce model
 FOLDER = 'downloaded_models'
 
-def get_extractor(channel,
-                  path,
-                  device):
+def get_extractor(channel:int,
+                  path:str,
+                  device:str):
     '''
         Get extractor from local
         Args:
             channel: config of model
             path: path to pretrained model
-            device
+            device: device for computing
     '''
     assert channel in [1024,512,256,128]
     extractor = EmbeddingExtractor(C=channel,
@@ -42,9 +43,13 @@ def get_extractor(channel,
         return None
     return extractor
 
-def check_pretrained_models(root,channel):
+def check_pretrained_models(root:str,
+                            channel:int):
     '''
-        Check pretrained model in 'root'/models and download
+        Check pretrained model in 'root'/FODDER and download
+        Args:
+            root: root to store models
+            channel: configuration of model
     '''
     path = os.path.join(root,FOLDER)
     if not os.path.exists(path):
@@ -56,16 +61,27 @@ def check_pretrained_models(root,channel):
             download_model(path,channel)
 
 
-def download_model(root,channel):
+def download_model(root:str,
+                   channel:int):
     '''
         Download models to $root/models
+        Args:
+            root: root to store models
+            channel: configuration of model
     '''
     url = URLS[channel]
     name = 'ecapa-tdnn-%s.model' % channel
     gdown.download(url, os.path.join(root,name),quiet=False,fuzzy=True)
 
 
-def get_model_path(root,channel):
+def get_model_path(root:str,
+                   channel:int):
+    '''
+        Get model path and download if pretrained models are not existed
+        Args:
+            root: root to store models
+            channel: configuration of model
+    '''
     path = os.path.join(root, FOLDER,'ecapa-tdnn-%s.model'%channel)
     files = glob.glob(path)
     if len(files) == 0:
@@ -75,6 +91,9 @@ def get_model_path(root,channel):
     return path
 
 def download_all_models(root):
+    '''
+        Download all pretrained model to root -> root/$FOLDER
+    '''
     for c in URLS:
         check_pretrained_models(root, c)
 

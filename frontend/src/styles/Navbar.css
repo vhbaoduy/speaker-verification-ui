@@ -26,6 +26,8 @@
   .site-title {
     font-size: 2rem;
     padding: 0rem;
+    justify-content: center;
+    text-align: center;
   }
   
   .nav ul {

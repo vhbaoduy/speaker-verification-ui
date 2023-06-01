@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/home.css"
 import Button from "react-bootstrap/Button"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
@@ -17,17 +16,17 @@ const Home = () => {
         navigate('/authentication');
       };
     return (
-        <Container className="my-home">
-          <Row>
+        <Container style={{ backgroundImage: `url('../../public/bg.jpg')` }}>
+          <Row className="p-4">
             <Col>
-              <Button variant="primary" size="lg" onClick={navigateToEnrollment}>
+              <Button variant="primary" size="lg" onClick={navigateToEnrollment} style={{width:"200px", height:"100px"}}>
                 Enrollment
               </Button>
             </Col>
           </Row>
-          <Row>
+          <Row className="p-4">
             <Col>
-              <Button variant="success" size="lg" onClick={navigateToTesting}>
+              <Button variant="success" size="lg" onClick={navigateToTesting} style={{width:"200px", height:"100px"}}>
                 Authentication
               </Button>
             </Col>

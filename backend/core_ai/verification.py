@@ -1,10 +1,9 @@
 from .extractors import get_extractor, get_model_path
 # from .matching import compute_score
 from .utils import convert_bytes_to_array
-from .local_config import Configs
+from .configs import Configs
 from .preprocessing import DataPreprocessing
 import numpy as np
-import torch
 from typing import List
 import soundfile as sf
 
@@ -18,7 +17,7 @@ class SpeakerVerification:
         self.extractor = get_extractor(channel=configs["model"],
                                         path=path,
                                         device=configs["device"])
-        self.threshold = Configs.THRESHOLD
+        self.threshold = configs["threshold"]
         self.preprocessor = DataPreprocessing(sampling_rate=Configs.SAMPLING_RATE,
                                               duration=Configs.DURATION,
                                               context_num_stack=Configs.NUM_STACK,
@@ -60,7 +59,9 @@ class SpeakerVerification:
                     embedding1, embedding2.T))
         return score
     
-    def verify(self, wav_data: bytes, database):
+    def verify(self, 
+               wav_data: bytes, 
+               database: List[np.ndarray]):
         feat = self.extract_features([wav_data])
         results = []
         max_score = 0

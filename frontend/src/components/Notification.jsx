@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Modal, Alert } from 'react-bootstrap';
 
-const Notification = ({ message, type }) => {
+const Notification = ({ message, type, onClose }) => {
   const [show, setShow] = useState(true);
 
   const handleClose = () => {
     setShow(false);
+    onClose();
   };
 
 //   const handleShow = () => {

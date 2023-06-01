@@ -1,3 +1,7 @@
+'''
+    Define Error Code from server
+'''
+
 class ErrorStatusCode: 
     USER_NOT_FOUND = "USER_NOT_FOUND",
     EXISTED_USER = "EXISTED_USER",

@@ -10,29 +10,6 @@ from pydub import AudioSegment
 
 TEMP_PATH = "./temp_files"
 
-def get_all_devices():
-    '''
-        Get all available device
-    '''
-    devices = [{
-        'id': 'cpu', 'name': 'CPU'
-    }]
-    
-    if torch.cuda.is_available():
-        device_count = torch.cuda.device_count()
-        if device_count == 1:
-            devices.append({
-                'id': 'cuda:0',
-                'name': torch.cuda.get_device_name(0)
-            })
-        else:
-            for i in range(device_count):
-                 devices.append({
-                'id': 'cuda:%s'%i,
-                'name': torch.cuda.get_device_name(i)
-            })
-    return devices
-
 
 def convert_bytes_to_array(wav_bytes,sr):
     '''

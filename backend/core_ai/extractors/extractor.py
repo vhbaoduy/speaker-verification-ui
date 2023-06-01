@@ -8,11 +8,20 @@ import warnings
 from .ecapa_tdnn import ECAPA_TDNN
 import torch.nn.functional as F
 import time
+import numpy as np
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class EmbeddingExtractor(nn.Module):
-    def __init__(self, C, device):
+    def __init__(self, 
+                 C:int, 
+                 device:str):
+        ''' 
+            Init object fore embedding extractor
+            Args:
+                C: the number of channel of ECAPA-TDNN model
+                device: device to computing (cpu, cuda:... )
+        '''
         super(EmbeddingExtractor, self).__init__()
 
         # ECAPA-TDNN
@@ -21,7 +30,13 @@ class EmbeddingExtractor(nn.Module):
         print(time.strftime("%m-%d %H:%M:%S") + " Model para number = %.2f" % (
             sum(param.numel() for param in self.speaker_encoder.parameters()) / 1024 / 1024))
 
-    def extract_embedding(self,audio):
+    def extract_embedding(self,
+                          audio:np.ndarray):
+        ''' 
+            Extract embedding features from audio
+            Args:
+                audio: numpy array with N x M shape, N: the number of audio, M: length of each audio
+        '''
         self.eval()
         # data = self.process_audio(audio)
         data = torch.Tensor(audio)
@@ -29,12 +44,9 @@ class EmbeddingExtractor(nn.Module):
         embeddings = self.speaker_encoder.forward(data, aug=False)
         embeddings = F.normalize(embeddings, p=2, dim=1)
         return embeddings
-        
-    def process_audio(self, audio):
-        # Todo: convert bytes to audio
-        return audio
     
-    def load_parameters(self, path):
+    def load_parameters(self, 
+                        path:str):
         '''
             Load parameters from pretrained model
             Args:
@@ -56,8 +68,3 @@ class EmbeddingExtractor(nn.Module):
             self_state[name].copy_(param)
     
 
-
-if __name__ == '__main__':
-    model = EmbeddingExtractor(C=1024,device='cuda:0')
-    print(model)
-    print(torch.cuda.mem_get_info(0))
