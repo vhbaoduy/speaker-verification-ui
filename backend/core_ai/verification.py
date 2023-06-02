@@ -33,7 +33,7 @@ class SpeakerVerification:
             
             # Process audio
             data1, data2 = self.preprocessor(audio)
-            sf.write('temp.wav',data1[0],16000)
+            # sf.write('temp.wav',data1[0],16000)
             feat1 = self.extractor.extract_embedding(data1)
             feat2 = self.extractor.extract_embedding(data2)
             # Convert from tensor to numpy

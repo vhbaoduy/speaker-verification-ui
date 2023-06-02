@@ -12,7 +12,7 @@ def get_default_config():
 
 # Hard configuration
 class Configs:
-    ROOT = './'
+    ROOT = '../' # for docker 
     SAMPLING_RATE = 16000   # sampling rate 
     DURATION = 4    # audio length
     NUM_STACK = 3 # for process data

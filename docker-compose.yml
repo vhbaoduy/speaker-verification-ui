@@ -7,11 +7,37 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - mongodb_data:/data/db
-    # environment:
-      # - MONGO_INITDB_ROOT_USERNAME=admin
-      # - MONGO_INITDB_ROOT_PASSWORD=secret
+      - mongodb:/data/db
     
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: "./backend"
+    container_name: authentication-services
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend_models:/backend/downloaded_models
+    
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: "./frontend"
+    container_name: frontend-ui-app
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontent:/app
 
+    environment:
+      - API_HOST=backend
+      - API_PORT=8000
 volumes:
-  mongodb_data:
+  mongodb:

@@ -1,13 +1,23 @@
 from pymongo import MongoClient
 from core_ai import get_default_config
+import os
 
-DB_URL = "mongodb://localhost:27017"
+MONGO_HOST = os.environ.get("MONGO_HOST")
+MONGO_PORT = int(os.environ.get("MONGO_PORT"))
+if MONGO_HOST is None:
+    MONGO_HOST = "localhost"
+
+if MONGO_PORT is None:
+    MONGO_PORT = 27017
+
+# DB_URL = f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
+
 
 def get_database():
     '''
         Get database instance
     '''
-    client = MongoClient(DB_URL)
+    client = MongoClient(MONGO_HOST,MONGO_PORT)
     return client['speaker_verification']
 
 def get_collection(db_connection,collection_name):

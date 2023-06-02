@@ -12,4 +12,32 @@ Build basic Web UI with *React* to use services from backend.
 
 ## How to Install
 
+### Prerequisite
+- [Docker](https://www.docker.com/)
+- [Git](https://git-scm.com/)
+- [CUDA](https://developer.nvidia.com/cuda-downloads) if you want to use GPU
+
+### Installation
+1. From `root` directory, clone the source code from the repository
+```bash
+git clone ...
+```
+2. Build docker container for application
+```
+cd ...
+docker-compose build
+```
+
+*Note*: The process may take more than 30 minutes (depending on your network speed).
+
+
+3. Start docker compose
+```
+docker-compose up -d
+```
+
+To track the process:
+```
+docker logs -f ...b
+```
 ## Usage section

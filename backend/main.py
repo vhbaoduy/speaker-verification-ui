@@ -26,8 +26,8 @@ server_api.add_middleware(
 
 
 
-if __name__ == '__main__':
-    uvicorn.run('main:server_api',
-                host=configs['host'],
-                port=configs['port'],
-                reload=True)
+# if __name__ == '__main__':
+#     uvicorn.run('main:server_api',
+#                 host=configs['host'],
+#                 port=configs['port'],
+#                 reload=True)

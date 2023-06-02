@@ -154,7 +154,7 @@ function Enrollment() {
             .catch((error) => {
                 console.log(error.message)
             })
-
+        // console.log(Configs.API_URL)
     }
     const handleDeleteUser = async (index) => {
         const userDelete = usersDB[index];
