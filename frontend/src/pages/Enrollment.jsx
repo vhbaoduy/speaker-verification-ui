@@ -194,7 +194,7 @@ function Enrollment() {
                 <Col md={8}>
                     <h1>Enrollment</h1>
                     <p>Record or Upload 3 files to enroll the system</p>
-                    <small className="text-muted">Each file more than 3 seconds</small>
+                    <small className="text-muted">Recommand: Each file more than 3 seconds</small>
                     <VoiceRecorder addFiles={addBlobFromRecorderToForm} />
 
                     <Form>

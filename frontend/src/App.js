@@ -3,7 +3,7 @@ import React from 'react';
 import MyNavbar from './components/Navbar';
 import Home from './pages/Home'
 import Setting from './pages/Setting'
-import About from './pages/About'
+// import About from './pages/About'
 import {Routes, Route } from "react-router-dom";
 import Enrollment from './pages/Enrollment';
 import Authentication from './pages/Authentication';
@@ -18,7 +18,7 @@ function App() {
             <Route path="/enrollment" element={<Enrollment />}/>
             <Route path="/authentication" element={<Authentication />}/>
             <Route path="/setting" element={<Setting />}/>
-            <Route path="/about" element={<About />}/>
+            {/* <Route path="/about" element={<About />}/> */}
         </Routes>
     </>  
   );
