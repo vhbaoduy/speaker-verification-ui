@@ -67,7 +67,7 @@ Currently, to connect with MongoDB through host: localhost and port: 27017
 
 Start services with FASTAPI
 ```
-uvicorn main:server_api
+uvicorn main:server_api --host localhost --port 8000
 ```
 Web API run on [http://localhost:8000](localhost:8000) default. Visit [http://localhost:8000/docs](localhost:8000/docs) to see implemented API.
 
@@ -113,9 +113,9 @@ As enrollment phase, the user must record or upload audio file to login to syste
 
 After that, the result will be shown on the screen with **reject** or **accept** and similarity score between the user and database.
 
-You can see the detail of installation and usage by [video]().
+You can see the detail of installation and usage by [video](https://youtu.be/rNwi1iydyrc).
 
-The current performance of sytem depend on the following conditions:
+The current performance of sytem depends on the following conditions:
 - The quality of audio (noise, echo, etc).
 - The length of audio to capture user's features.
 - The context when recording audio from users.
