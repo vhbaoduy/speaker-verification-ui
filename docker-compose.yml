@@ -2,7 +2,7 @@ version: '3'
 services:
   mongodb:
     image: mongo
-    container_name: mongodb
+    container_name: mongodb-app
     restart: unless-stopped
     ports:
       - 27017:27017
@@ -22,7 +22,7 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - ./backend_models:/backend/downloaded_models
+      - ./backend:/app
     
   frontend:
     build:
@@ -34,7 +34,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontent:/app
+      - ./frontend:/app
 
     environment:
       - API_HOST=backend

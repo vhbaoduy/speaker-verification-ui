@@ -12,19 +12,6 @@ from bson.binary import Binary
 '''
     Run benchmark of system
 '''
-# class DataTesting(object):
-#     def __init__(self, files):
-#         self.files = files
-    
-#     def __len__(self):
-#         return len(self.files)
-    
-#     def __getitem__(self,idx):
-#         rf = open(self.files[idx], 'rb')
-#         wav_bytes = rf.read()
-#         data = CORE_CONTROLLER.instance.preprocessor(wav_bytes)
-#         return 
-
     
 
 
