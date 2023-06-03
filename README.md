@@ -23,8 +23,8 @@ Build basic Web UI with *React* to use services from backend.
 ### Installation
 1. From `root` directory, clone the source code from the repository
 ```bash
-git clone ...
-cd ...
+git clone https://github.com/vhbaoduy/voice-authentication.git
+cd voice-authentication
 ```
 
 ### Build with docker
